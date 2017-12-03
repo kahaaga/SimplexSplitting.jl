@@ -1,7 +1,3 @@
-module TensorDecomposition
-
-export tensordecomposition
-
 """ Decomposition of the integers  0:(k^p - 1) in powers of k.
 
 """
@@ -15,7 +11,7 @@ function tensordecomposition(k::Int, p::Int)
 
     # Returns an array of dimension k^p x p.
     # Each row contains the decomposition of the index of the row minus one
+
     return T
-end
 
 end
