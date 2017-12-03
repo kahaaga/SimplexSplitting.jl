@@ -1,5 +1,7 @@
 module SimplexSplitting
 
-# package code goes here
+include("tensordecomposition.jl")
+
+export tensordecomposition
 
 end # module
