@@ -2,7 +2,7 @@
 # k = the size reducing factor.
 # d = dimension
 # Finds all the possible ways of
-function simplex_splitting(k::Int, d::Int)
+function simplex_split(k::Int, d::Int)
 
     factor::Int = k^d
 
@@ -19,8 +19,6 @@ function simplex_splitting(k::Int, d::Int)
     for a = 1:size(sequences, 1)
         tmp = ones(Int, k * (d+1), 1)
         for b = 1:(d-1)
-            #@show size(tmp), χ[a, b] + 1, χ[a, b+1]
-            #@show tmp[(χ[a, b] + 1):(χ[a, b+1])]
             tmp[(χ[a, b] + 1):(χ[a, b+1])] = (b+1) * ones(χ[a, b+1] - χ[a, b], 1)
         end
 
