@@ -48,10 +48,10 @@ function simplicial_subdivision(k::Int, E::Int)
 
     V::Array{Int, 2} = repmat(uniquelabels, 1, E + 1)
 
-    @show tmp = repmat((((E+1)^k - 1) ./ E) * collect(0:E).', n_rows, 1)
+    tmp = repmat((((E+1)^k - 1) ./ E) * collect(0:E).', n_rows, 1)
 
-    @show tmp = heaviside0(-abs.(V - tmp)) .* repmat(collect(1:n_rows), 1, E + 1)
-    @show tmp = tmp[find(tmp)]
+    tmp = heaviside0(-abs.(V - tmp)) .* repmat(collect(1:n_rows), 1, E + 1)
+    tmp = tmp[find(tmp)]
 
     aux = round.(Int, tmp)
     Caux = round.(Int, complementary(tmp, n_rows))
