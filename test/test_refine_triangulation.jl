@@ -26,8 +26,8 @@ tau = 1
 
 
     @testset "Refine triangulation" begin
-        @testset "E = $E" for E in 2:7
-            @testset "k = $k" for k in 1:3
+        @testset "E = $E" for E in 2:4
+            @testset "k = $k" for k in 1:4
                 splitting_rules = simplicial_subdivision(k, E)
                 embedding = embedding_example(n_points, E, 1)
                 triang_points, simplex_indices = triangulate(embedding)
