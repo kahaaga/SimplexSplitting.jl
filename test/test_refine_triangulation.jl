@@ -94,3 +94,17 @@ tau = 1
         end
     end
 end
+
+@testset "Centroids and radii of triangulation" begin
+    @testset "E = $E" for E in 2:4
+        @testset "k = $k" for k in 1:4
+            splitting_rules = simplicial_subdivision(k, E)
+            embedding = embedding_example(n_points, E, 1)
+            triang_points, simplex_indices = triangulate(embedding)
+
+            centroids, radii = centroids_radii2(triang_points, simplex_indices)
+            @test isa(centroids, Array{Float64, 2})
+            @test isa(radii, Array{Float64, 1})
+        end
+    end
+end
