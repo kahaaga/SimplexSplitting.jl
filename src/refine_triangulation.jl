@@ -1,17 +1,10 @@
-# Refine a triangulation.
-# vertices is a (n_triangulation_vertices x embeddingdim) sized array where each row is
-# a vertex of the triangulation.
-# simplex_indices is an array of size (n_trinagulation_simplices x (embeddingdim+1)). Each
-# row of simplex_indices contains the indices of the vertices (rows of the vertices array)
-# furnishing the corresponding simplex.
-# split_indices are the row numbers of simplex_indices indicating which simplices should
-# be split.
-# splitting_rules is the output of the SimplicialSubdivisionMultiple function run with
-# E = embeddingdim and k = the size reducing factor. It is a tuple, where the first entry
-# contains an array with information about the strictly new vertices and the second entry
-# contains information about how to create the new simplices as linear combinations
-# of the new vertices plus the vertices of the original simplex.
-function refine_triangulation(triang_vertices, triang_simplex_indices, splitting_rules, split_indices)
+"""
+    refine_triangulation(triang_vertices, triang_simplex_indices, split_indices, k)
+
+Refine a triangulation with explicitly providing the splitting rules. In this function,
+these are computed internally, using a splitting factor of k.
+"""
+function refine_triangulation(triang_vertices, triang_simplex_indices, split_indices, k)
 
     if length(split_indices) == 0
         untouched_indices = collect(1:size(triang_simplex_indices, 1))
@@ -25,17 +18,15 @@ function refine_triangulation(triang_vertices, triang_simplex_indices, splitting
     # The dimension of the space
     E = size(triang_vertices, 2)
 
-    # The size reducing factor.
-    k = size(splitting_rules[1], 2)
 
-
+    # Generic rules for splitting a simplex
+    splitting_rules = simplicial_subdivision(k, E)
 
     # Rules for forming the strictly new vertices of the subtriangulation
     rules = splitting_rules[1]
 
     # Array where each row represents one of the new simplices in the splitted simplex
     subtriangulation = splitting_rules[2]
-
 
     # How many new vertices are created each split?
     n_newvertices_eachsplit = size(rules, 1)

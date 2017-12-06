@@ -2,7 +2,7 @@ n_points = 10
 tau = 1
 
 @testset "Refine triangulation with images" begin
-    @testset "E = $E" for E in 2:4
+    @testset "E = $E" for E in 3:5
         @testset "k = $k" for k in 1:4
             splitting_rules = simplicial_subdivision(k, E)
             embedding = embedding_example(n_points, E, 1)
@@ -21,8 +21,7 @@ tau = 1
 
             simplices = [triang_points[simplex_indices[i, :], :] for i in 1:n_orig]
             refined_triangulation = refine_triangulation_images(triang_points, simplex_indices,
-                                    splitting_rules, image_vertices,
-                                    split_indices = collect(1:3))
+                                    splitting_rules, image_vertices, collect(1:3), k)
 
             # How many new simplices did we get?
             n_refined = size(refined_triangulation[2], 1)
