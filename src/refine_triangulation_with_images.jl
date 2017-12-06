@@ -19,7 +19,7 @@
 
 """
 function refine_triangulation_images(triang_vertices, triang_simplex_indices, splitting_rules,
-    image_triang_vertices; split_indices = [])
+    image_triang_vertices, split_indices, k)
 
     if length(split_indices) == 0
         return triang_vertices, triang_simplex_indices, image_triang_vertices
@@ -30,15 +30,12 @@ function refine_triangulation_images(triang_vertices, triang_simplex_indices, sp
     # The dimension of the space
     E = size(triang_vertices, 2)
 
-    # The size reducing factor.
-    k = size(splitting_rules[1], 2)
-
     # Rules for forming the strictly new vertices of the subtriangulation
+    splitting_rules = simplicial_subdivision(k, E)
     rules = splitting_rules[1]
 
     # Array where each row represents one of the new simplices in the splitted simplex
     subtriangulation = splitting_rules[2]
-
 
     # How many new vertices are created each split?
     n_newvertices_eachsplit = size(rules, 1)

@@ -27,7 +27,7 @@ tau = 1
 
     @testset "Refine triangulation" begin
         @testset "E = $E" for E in 2:4
-            @testset "k = $k" for k in 1:4
+            @testset "k = $k" for k in 1:3
                 splitting_rules = simplicial_subdivision(k, E)
                 embedding = embedding_example(n_points, E, 1)
                 triang_points, simplex_indices = triangulate(embedding)
@@ -36,8 +36,7 @@ tau = 1
                 n_orig = size(simplex_indices, 1)
 
                 simplices = [triang_points[simplex_indices[i, :], :] for i in 1:n_orig]
-                refined_triangulation = refine_triangulation(triang_points, simplex_indices,
-                                    splitting_rules, collect(1:n_orig))
+                refined_triangulation = refine_triangulation(triang_points, simplex_indices, collect(1:n_orig), k)
 
                 # How many new simplices did we get?
                 n_refined = size(refined_triangulation[2], 1)
@@ -77,8 +76,7 @@ tau = 1
                 # factor.
                 splitting_rules = simplicial_subdivision(k, E)
 
-                refined = refine_triangulation(canonical_simplex_vertices, simplex_indices,
-                                                splitting_rules, [1])
+                refined = refine_triangulation(canonical_simplex_vertices, simplex_indices, [1], k)
 
                 # How many new simplices did we get?
                 n = size(refined[2], 1)
