@@ -1,26 +1,23 @@
-
+"""
 # k = the size reducing factor.
 # d = dimension
 # Finds all the possible ways of
-function simplex_splitting(k::Int, d::Int)
-
-    factor::Int = k^d
-
-    matrices_simplicial_subdivision::Array{Int, 2} = zeros((d + 1) * factor, k)
+"""
+function simplex_split(k::Int, d::Int; orientations = false)
 
     sequences::Array{Int, 2} = tensordecomposition(k, d)
+    n_seq = size(sequences, 1)
 
-    χ::Array{Int, 2} = sequences .* (d+1) +
-                                repmat(collect(1:d).', size(sequences, 1), 1)
+    χ1 = sequences .* (d + 1)
+    χ2 = repmat(collect(1:d).', n_seq, 1)
+    χ::Array{Int, 2} = χ1 .+ χ2
     χ = sort(χ, 2)
 
-    #return size(sequences)
+    matrices_simplicial_subdivision::Array{Int, 2} = zeros((d + 1) * k^d, k)
 
-    for a = 1:size(sequences, 1)
-        tmp = ones(Int, k * (d+1), 1)
+    for a = 1:n_seq
+        tmp = ones(Int, k * (d+1))
         for b = 1:(d-1)
-            #@show size(tmp), χ[a, b] + 1, χ[a, b+1]
-            #@show tmp[(χ[a, b] + 1):(χ[a, b+1])]
             tmp[(χ[a, b] + 1):(χ[a, b+1])] = (b+1) * ones(χ[a, b+1] - χ[a, b], 1)
         end
 
@@ -31,7 +28,7 @@ function simplex_splitting(k::Int, d::Int)
     end
 
 
-    simplex_orientations = zeros(Float64, factor, 1)
+    simplex_orientations = zeros(Float64, k^d, 1)
     Χ_values = zeros(Int, d, 1)
 
     for i = 1:size(simplex_orientations, 1)
@@ -49,8 +46,14 @@ function simplex_splitting(k::Int, d::Int)
             M[j, Χ_values[j]] = 1
         end
 
-        simplex_orientations[i] = det(M) / factor
+        simplex_orientations[i] = det(M) / k^d
     end
 
-    return matrices_simplicial_subdivision, simplex_orientations
+
+    if orientations # Should the orientations of the simplices also be returned?
+        return matrices_simplicial_subdivision, simplex_orientations
+    else
+        return matrices_simplicial_subdivision
+    end
+
 end
