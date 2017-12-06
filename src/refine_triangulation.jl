@@ -11,7 +11,7 @@
 # contains an array with information about the strictly new vertices and the second entry
 # contains information about how to create the new simplices as linear combinations
 # of the new vertices plus the vertices of the original simplex.
-function refine_triangulation(triang_vertices, triang_simplex_indices, splitting_rules; split_indices = [])
+function refine_triangulation(triang_vertices, triang_simplex_indices, splitting_rules, split_indices)
 
     if length(split_indices) == 0
         untouched_indices = collect(1:size(triang_simplex_indices, 1))
