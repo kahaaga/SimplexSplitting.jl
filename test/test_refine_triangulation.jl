@@ -37,7 +37,7 @@ tau = 1
 
                 simplices = [triang_points[simplex_indices[i, :], :] for i in 1:n_orig]
                 refined_triangulation = refine_triangulation(triang_points, simplex_indices,
-                                    splitting_rules, split_indices = collect(1:n_orig))
+                                    splitting_rules, collect(1:n_orig))
 
                 # How many new simplices did we get?
                 n_refined = size(refined_triangulation[2], 1)
@@ -78,7 +78,7 @@ tau = 1
                 splitting_rules = simplicial_subdivision(k, E)
 
                 refined = refine_triangulation(canonical_simplex_vertices, simplex_indices,
-                                                splitting_rules, split_indices = [1])
+                                                splitting_rules, [1])
 
                 # How many new simplices did we get?
                 n = size(refined[2], 1)
