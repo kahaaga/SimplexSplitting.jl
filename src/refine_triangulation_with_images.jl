@@ -1,28 +1,26 @@
-# Refine a triangulation.
-# vertices is a (n_triangulation_vertices x embeddingdim) sized array where each row is
-# a vertex of the triangulation.
-# simplex_indices is an array of size (n_trinagulation_simplices x (embeddingdim+1)). Each
-# row of simplex_indices contains the indices of the vertices (rows of the vertices array)
-# furnishing the corresponding simplex.
-# split_indices are the row numbers of simplex_indices indicating which simplices should
-# be split.
-# splitting_rules is the output of the SimplicialSubdivisionMultiple function run with
-# E = embeddingdim and k = the size reducing factor. It is a tuple, where the first entry
-# contains an array with information about the strictly new vertices and the second entry
-# contains information about how to create the new simplices as linear combinations
-# of the new vertices plus the vertices of the original simplex.
-# @param image_triang_vertices The image vertices ONLY THE FIRST TIME. BEFORE THE FIRST SPLITTING.
-
 """
     refine_triangulation_images(triang_vertices, triang_simplex_indices, splitting_rules,
-                                image_triang_vertices; split_indices = [])
+                                image_vertices, split_indices = [])
 
+Refine a triangulation (composed of simplices), also updating the images of the simplices
+in the triangulation.
+
+`triang_vertices::Array{Float64, 2} is a (n_triangulation_vertices x embeddingdim) sized
+    array where each row is a vertex of the triangulation.
+`triang_simplex_indices::Array{Int, 2}` is an array of size
+    (n_trinagulation_simplices x (embeddingdim+1)). Each row of simplex_indices contains
+    the indices of the vertices (rows of the vertices array) furnishing the corresponding
+    simplex.
+`image_vertices::Array{Float64, 2} is a (n_triangulation_vertices x embeddingdim) sized
+        array where each row is a vertex of the triangulation.
+`split_indices::Array{Int, 1}` are the row numbers of simplex_indices indicating which
+    simplices should be split.
 """
-function refine_triangulation_images(triang_vertices, triang_simplex_indices, splitting_rules,
-    image_triang_vertices, split_indices, k)
+function refine_triangulation_images(triang_vertices, triang_simplex_indices,
+                                    image_vertices, split_indices, k)
 
     if length(split_indices) == 0
-        return triang_vertices, triang_simplex_indices, image_triang_vertices
+        return triang_vertices, triang_simplex_indices, image_vertices
     end
     # The number of simplices to split
     n_split_simplices = length(split_indices)
@@ -59,7 +57,7 @@ function refine_triangulation_images(triang_vertices, triang_simplex_indices, sp
         # n_newvertices_eachsplit new vertices will be a linear combination
         # of these vertices. Each row is a vertex.
         vertices = triang_vertices[triang_simplex_indices[simplex_idx, :], :]
-        imagevertices = image_triang_vertices[triang_simplex_indices[simplex_idx, :], :]
+        imagevertices = image_vertices[triang_simplex_indices[simplex_idx, :], :]
 
         # Generate the strictly new vertices for each sub
         for j = 1:n_newvertices_eachsplit
@@ -109,7 +107,7 @@ function refine_triangulation_images(triang_vertices, triang_simplex_indices, sp
     # Combine old and newly introduced vertices
     num_vertices_beforesplit = size(triang_vertices, 1)
     triang_vertices = vcat(triang_vertices, new_vertices_noreps)
-    image_triang_vertices = vcat(image_triang_vertices, new_imagevertices_noreps)
+    image_vertices = vcat(image_vertices, new_imagevertices_noreps)
 
     # Update the Ind array, so that we start at the new vertices
     Ind = Ind + num_vertices_beforesplit
@@ -127,7 +125,7 @@ function refine_triangulation_images(triang_vertices, triang_simplex_indices, sp
 
         # Figure out what the row indices corresponding to the ith simplex
         # must be. Marks the beginning of each of the simplex stacks in new_vertices
-        ind = n_newvertices_eachsplit * (i -1)
+        ind = n_newvertices_eachsplit * (i - 1)
 
         # Index of the simplex we need to split
         simplex_idx = split_indices[i]
@@ -151,5 +149,5 @@ function refine_triangulation_images(triang_vertices, triang_simplex_indices, sp
     triang_simplex_indices = round.(Int, vcat(triang_simplex_indices[untouched_indices, :],
                                   newtriangulation))
 
-    return triang_vertices, triang_simplex_indices, image_triang_vertices, untouched_indices
+    return triang_vertices, triang_simplex_indices, image_vertices, untouched_indices
 end
