@@ -2,7 +2,7 @@ frac_orig_size = 0.2
 
 @testset "Recursive splitting with forward linear maps of simplices" begin
     @testset "E = $E" for E in 2:3
-        @testset "k = $k" for k in 2:3
+        @testset "k = $k" for k in 1:3
         embedding = embedding_example(10, E, 1)
 
         # Triangulate all but the last point
@@ -20,12 +20,13 @@ frac_orig_size = 0.2
 
         radiusmax = max(maximum(radii), maximum(radii_im))
         maxradius_allowed = radiusmax * 0.5
+        @show maxradius_allowed
 
         refined = refine_recursive_images(points, image_points, simplex_inds, maxradius_allowed, 2)
         radiusmax_after_refinement = max(maximum(refined[6]), maximum(refined[7]))
 
         # Check that the maximum simplex size has been reduced to the desired level
-        @test radiusmax_after_refinement < maxradius_allowed 
+        @test radiusmax_after_refinement < maxradius_allowed
         end
     end
 end
