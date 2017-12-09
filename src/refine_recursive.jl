@@ -1,5 +1,5 @@
 """
-    refine_triangulation(points, simplex_inds, refsize, k, factor)
+    refine_triangulation(points, simplex_inds, maxsize, k, factor)
 
 Refine a triangulation recursively. Continue splitting some fraction of the simplices
 with size reduction factor of 2 until until the maximum simplex size is below some
@@ -9,25 +9,35 @@ reference size.
 Returns a tuple containing the refined triangulation and some information about it, as
 follows: (points, simplex_inds, centroids, radii)
 """
-function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
+function refine_recursive(points, simplex_inds, maxsize, k; niter = 1)
     centroids, radii = centroids_radii2(points, simplex_inds)
 
     # If convergence is reached, return the triangulation and the centroids and radii of
     # the simplices furnishing the triangulation
-    if maximum(radii) < refsize * factor
+    maxradius = maximum(radii)
+    println("Refinement #", niter, "\t Maximum simplex radius: ", maxradius)
+
+    if maxradius < maxsize || niter > 20
+        println("Refinement process finished after ", niter, " iterations.")
+        println("Final maximum simplex radius: ", maxradius)
         return points, simplex_inds, centroids, radii
     end
 
     # If no convergence, continue splitting some fraction of the largest simplices.
     if length(radii) == 1
-        split_indices = find(radii .> mean(radii) * 0.99)
+        split_indices = [1]
     else
-        split_indices = find(radii .> reflast)
+        # Check if all elements are approximately the same size. If so, we must split all
+        # of them.
+        if all(y-> isapprox(radii[1], y), radii)
+            split_indices =  find(radii .> 0)
+        elseif all(y-> isapprox(radii[1], y), radii_im)
+            split_indices =  find(radii_im .> 0)
+        else # If all radii are not equal, split all simplices with nonzero radius
+            split_indices = find(radii .> quantile(radii, 0.95))
+        end
     end
-
-    # There might be no simplices small enough to fall within the criteria above. If so,
-    # split all simplices
-    split_indices = find(radii .> 0)
+    @show split_indices
 
     # The number of simplices to split
     n_split_simplices = length(split_indices)
@@ -141,7 +151,5 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
     all_simplex_inds = round.(Int, vcat(simplex_inds[untouched_indices, :],
                                   newtriangulation))
 
-    reflast = mean(radii)
-
-    refine_recursive(allpoints, all_simplex_inds, refsize, reflast, k, factor)
+    refine_recursive(allpoints, all_simplex_inds, maxsize, k, niter = niter + 1)
 end
