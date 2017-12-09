@@ -30,14 +30,24 @@ function refine_recursive_images(points, image_points, simplex_inds, maxsize, k;
     if length(radii) == 1
         split_indices = [1]
     else
-        # Check if all elements are approximately the same size. If so, we must split all
-        # of them.
-        if all(y-> isapprox(radii[1], y), radii)
-            split_indices =  find(radii .> 0)
-        elseif all(y-> isapprox(radii[1], y), radii_im)
-            split_indices =  find(radii_im .> 0)
-        else # If all radii are not equal, split all simplices with nonzero radius
-            split_indices = find(radii .> quantile(radii, 0.95))
+        # What portion of the largest simplices to split (1 - percentile)?
+        percentile = 0.95
+        split_indices = []
+
+        # If the simplices in the triangulation are very regular, there might not be
+        # any simplices larger than a given percentile. If so, reduce percentile iteratively
+        # until there are simplices larger than the percentile.
+        while length(split_indices) == 0
+            # Check if all elements are approximately the same size. If so, we must split all
+            # of them.
+            if all(y-> isapprox(radii[1], y), radii)
+                split_indices =  find(radii .> 0)
+            elseif all(y-> isapprox(radii[1], y), radii_im)
+                split_indices =  find(radii_im .> 0)
+            else
+                split_indices = find(radii .> quantile(radii, percentile))
+            end
+            percentile = percentile - 0.05
         end
     end
 
