@@ -37,7 +37,6 @@ function refine_recursive(points, simplex_inds, maxsize, k; niter = 1)
             split_indices = find(radii .> quantile(radii, 0.95))
         end
     end
-    @show split_indices
 
     # The number of simplices to split
     n_split_simplices = length(split_indices)
