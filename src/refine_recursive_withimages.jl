@@ -1,21 +1,24 @@
 """
-    refine_triangulation(points, simplex_inds, refsize, k, factor)
+    refine_triangulation_images(points, image_points simplex_inds, refsize, k, factor)
 
-Refine a triangulation recursively. Continue splitting some fraction of the simplices
+Refine a triangulation recursively, taking both the simplices and their projection one
+time step into the future. Continue splitting some fraction of the simplices
 with size reduction factor of 2 until until the maximum simplex size is below some
-reference size.
-
+reference size 'refsize' (for example, the maximum simplex size in the original
+triangulation).
 
 Returns a tuple containing the refined triangulation and some information about it, as
-follows: (points, simplex_inds, centroids, radii)
+follows: (points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im)
 """
-function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
+
+function refine_recursive_images(points, image_points, simplex_inds, refsize, reflast, k, factor)
     centroids, radii = centroids_radii2(points, simplex_inds)
+    centroids_im, radii_im = centroids_radii2(image_points, simplex_inds)
 
     # If convergence is reached, return the triangulation and the centroids and radii of
     # the simplices furnishing the triangulation
-    if maximum(radii) < refsize * factor
-        return points, simplex_inds, centroids, radii
+    if maximum(radii) < refsize * factor && maximum(radii_im) < refsize * factor
+        return points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im
     end
 
     # If no convergence, continue splitting some fraction of the largest simplices.
@@ -50,12 +53,13 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
     # We need an array that can accomodate all of them. Each row in this
     # array will be a new vertex. Stacks of n_newvertices_eachsplit * E arrays.
     # We have as many as we have simplices to split.
-    new_vertices = zeros(n_newvertices_eachsplit * n_split_simplices, E)
+    new_points = zeros(n_newvertices_eachsplit * n_split_simplices, E)
+    new_imagepoints = zeros(n_newvertices_eachsplit * n_split_simplices, E)
 
     # Fill the array by looping over all simplices that we want to split
     for i = 1:n_split_simplices
         # Figure out what the row indices corresponding to the ith simplex
-        # must be. Marks the beginning of each of the simplex stacks in new_vertices
+        # must be. Marks the beginning of each of the simplex stacks in new_points
         ind = n_newvertices_eachsplit * (i -1)
 
         # Index of the simplex we need to split
@@ -65,6 +69,7 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
         # n_newvertices_eachsplit new vertices will be a linear combination
         # of these vertices. Each row is a vertex.
         vertices = points[simplex_inds[simplex_idx, :], :]
+        imagevertices = image_points[simplex_inds[simplex_idx, :], :]
 
         # Generate the strictly new vertices for each sub
         for j = 1:n_newvertices_eachsplit
@@ -79,26 +84,42 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
 
             # Pick the corresponding original vertices with indices contained in rules[j, :]
             original_vertices = vertices[rules[j, :], :]
+            original_vertices_image = imagevertices[rules[j, :], :]
 
-            new_vertices[ind_newvertex, :] = sum(original_vertices, 1) ./ k
+            new_points[ind_newvertex, :] = sum(original_vertices, 1) ./ k
+            new_imagepoints[ind_newvertex, :] = sum(original_vertices_image, 1) ./ k
 
         end
     end
 
     # Find the unique new vertices
-    new_vertices_noreps = unique(new_vertices, 1)
-    Ind = Vector{Int}(size(new_vertices, 1))
-    for i = 1:size(new_vertices_noreps, 1)
-        for j = 1:size(new_vertices, 1)
-            if new_vertices_noreps[i, :] == new_vertices[j, :]
+    new_points_noreps = unique(new_points, 1)
+    new_imagepoints_noreps = Array{Float64}(size(new_points_noreps, 1), E)
+
+    Ind = Vector{Int}(size(new_points, 1))
+    for i = 1:size(new_points_noreps, 1)
+
+        count = 0
+
+        for j = 1:size(new_points, 1) # run over the possibly repeated vertices
+            if new_points_noreps[i, :] == new_points[j, :]
                 Ind[j] = i
+
+                count = count + 1
+                if count == 1
+                    new_imagepoints_noreps[i, :] = new_imagepoints[j, :]
+                end
             end
         end
     end
 
+    # TEST:  assert all zeros.
+    #@show unique(new_imagepoints, 1) - new_imagepoints_noreps
+
     # Combine old and newly introduced vertices
     num_vertices_beforesplit = size(points, 1)
-    allpoints = vcat(points, new_vertices_noreps)
+    points = vcat(points, new_points_noreps)
+    image_points = vcat(image_points, new_imagepoints_noreps)
 
     # Update the Ind array, so that we start at the new vertices
     Ind = Ind + num_vertices_beforesplit
@@ -115,8 +136,8 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
         index = num_simplices_each_split * (i - 1)
 
         # Figure out what the row indices corresponding to the ith simplex
-        # must be. Marks the beginning of each of the simplex stacks in new_vertices
-        ind = n_newvertices_eachsplit * (i -1)
+        # must be. Marks the beginning of each of the simplex stacks in new_points
+        ind = n_newvertices_eachsplit * (i - 1)
 
         # Index of the simplex we need to split
         simplex_idx = split_indices[i]
@@ -125,8 +146,8 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
         inds_original_vertices = simplex_inds[simplex_idx, :]
 
         # Indices of the new vertices. Should be a column vector
-        inds_new_vertices = Ind[(ind + 1):(ind + n_newvertices_eachsplit)]
-        inds_all_vertices = vcat(inds_original_vertices, inds_new_vertices)
+        inds_new_points = Ind[(ind + 1):(ind + n_newvertices_eachsplit)]
+        inds_all_vertices = vcat(inds_original_vertices, inds_new_points)
 
         # Go through each of the subsimplices formed by splitting that simplex
         for j = 1:num_simplices_each_split
@@ -135,13 +156,12 @@ function refine_recursive(points, simplex_inds, refsize, reflast, k, factor)
     end
 
     # Indices of the simplices that are not split
-    untouched_indices = setdiff(1:size(simplex_inds, 1), split_indices)
+    untouched_indices = complementary(split_indices, size(simplex_inds, 1))
 
-
-    all_simplex_inds = round.(Int, vcat(simplex_inds[untouched_indices, :],
+    simplex_inds = round.(Int, vcat(simplex_inds[untouched_indices, :],
                                   newtriangulation))
 
-    reflast = mean(radii)
+    reflast = max(mean(radii), mean(radii_im))
 
-    refine_recursive(allpoints, all_simplex_inds, refsize, reflast, k, factor)
+    refine_recursive_images(points, image_points, simplex_inds, refsize, reflast, k, factor)
 end
