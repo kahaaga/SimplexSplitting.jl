@@ -149,6 +149,5 @@ function plot_triangulation(triang_vertices, triang_simplex_indices)
       push!(data, trace)
    end
 
-
    PlotlyJS.plot(data, layout)
 end
