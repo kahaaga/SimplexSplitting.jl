@@ -1,8 +1,8 @@
 frac_orig_size = 0.2
 
 @testset "Recursive splitting" begin
-    @testset "E = $E" for E in 2:5
-        @testset "k = $k" for k in 2:3
+    @testset "E = $E" for E in 2:2
+        @testset "k = $k" for k in 2:2
             canonical_simplex_vertices = zeros(E + 1, E)
             canonical_simplex_vertices[2:(E + 1), :] = eye(E)
             canonical_simplex_vol = abs(det(hcat(canonical_simplex_vertices, ones(E + 1))))
@@ -16,10 +16,12 @@ frac_orig_size = 0.2
             # Generic splitting rules for this combination of dimension and splitting
             # factor.
             radiusmax = maximum(radii)
-            refined = refine_recursive(canonical_simplex_vertices, simplex_indices, radiusmax, radiusmax, 2, frac_orig_size)
+
+            maxradius_allowed = radiusmax * 0.5
+            refined = refine_recursive(canonical_simplex_vertices, simplex_indices, maxradius_allowed, 2)
 
             radiusmax_after_refinement = maximum(refined[4])
-            @test radiusmax_after_refinement < radiusmax * frac_orig_size
+            @test radiusmax_after_refinement < maxradius_allowed
         end
     end
 end

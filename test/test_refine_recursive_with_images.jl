@@ -19,13 +19,13 @@ frac_orig_size = 0.2
         centroids_im, radii_im = centroids_radii2(image_points, simplex_inds)
 
         radiusmax = max(maximum(radii), maximum(radii_im))
+        maxradius_allowed = radiusmax * 0.5
 
-        refined = refine_recursive_images(points, image_points, simplex_inds, radiusmax, radiusmax, 2, frac_orig_size)
-
+        refined = refine_recursive_images(points, image_points, simplex_inds, maxradius_allowed, 2)
         radiusmax_after_refinement = max(maximum(refined[6]), maximum(refined[7]))
 
         # Check that the maximum simplex size has been reduced to the desired level
-        @test radiusmax_after_refinement < radiusmax * frac_orig_size
+        @test radiusmax_after_refinement < maxradius_allowed 
         end
     end
 end

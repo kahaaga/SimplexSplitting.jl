@@ -11,21 +11,34 @@ Returns a tuple containing the refined triangulation and some information about 
 follows: (points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im)
 """
 
-function refine_recursive_images(points, image_points, simplex_inds, refsize, reflast, k, factor)
+function refine_recursive_images(points, image_points, simplex_inds, maxsize, k; niter = 1)
     centroids, radii = centroids_radii2(points, simplex_inds)
     centroids_im, radii_im = centroids_radii2(image_points, simplex_inds)
 
     # If convergence is reached, return the triangulation and the centroids and radii of
     # the simplices furnishing the triangulation
-    if maximum(radii) < refsize * factor && maximum(radii_im) < refsize * factor
+    maxradius = max(maximum(radii), maximum(radii_im))
+    println("Refinement #", niter, "\t Maximum simplex radius: ", maxradius)
+
+    if maxradius < maxsize && maxradius < maxsize
+        println("Refinement process finished after ", niter, " iterations.")
+        println("Final maximum simplex radius: ", maxradius)
         return points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im
     end
 
     # If no convergence, continue splitting some fraction of the largest simplices.
     if length(radii) == 1
-        split_indices = find(radii .> mean(radii) * 0.99)
+        split_indices = [1]
     else
-        split_indices = find(radii .> reflast)
+        # Check if all elements are approximately the same size. If so, we must split all
+        # of them.
+        if all(y-> isapprox(radii[1], y), radii)
+            split_indices =  find(radii .> 0)
+        elseif all(y-> isapprox(radii[1], y), radii_im)
+            split_indices =  find(radii_im .> 0)
+        else # If all radii are not equal, split all simplices with nonzero radius
+            split_indices = find(radii .> quantile(radii, 0.95))
+        end
     end
 
     # There might be no simplices small enough to fall within the criteria above. If so,
@@ -161,7 +174,6 @@ function refine_recursive_images(points, image_points, simplex_inds, refsize, re
     simplex_inds = round.(Int, vcat(simplex_inds[untouched_indices, :],
                                   newtriangulation))
 
-    reflast = max(mean(radii), mean(radii_im))
 
-    refine_recursive_images(points, image_points, simplex_inds, refsize, reflast, k, factor)
+    refine_recursive_images(points, image_points, simplex_inds, maxsize, k; niter = niter + 1)
 end
