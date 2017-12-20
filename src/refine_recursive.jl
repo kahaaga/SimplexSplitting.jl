@@ -23,8 +23,12 @@ function refine_recursive(points, simplex_inds, maxsize, k; niter = 1)
     maxradius = maximum(radii)
     print("Refinement #", niter, "\tMaximum simplex radius = ", round(maxradius, 4),  ". ")
 
-    if maxradius < maxsize || niter > 50
-        println("\n\t\tRefinement finished.\n")
+    if maxradius < maxsize || niter > 100
+        if niter > 100
+            println("\n\t\tMaximum number of iterations (100) reached. Ending refinement.")
+        else
+            println("\n\t\tRefinement finished.\n")
+        end
         simplexvolumes = simplex_volumes(points, simplex_inds)
 
         return points, simplex_inds, centroids, radii, simplexvolumes

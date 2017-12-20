@@ -25,8 +25,12 @@ function refine_recursive_images(points, image_points, simplex_inds, maxsize, k;
     maxradius = max(maximum(radii), maximum(radii_im))
     print("Refinement #", niter, "\tMaximum simplex radius = ", floor(maxradius, 4),  ". ")
 
-    if maxradius < maxsize || niter > 50
-        println("\n\t\tRefinement finished.\n")
+    if maxradius < maxsize || niter > 100
+        if niter > 100
+            println("\n\t\tMaximum number of iterations (100) reached. Ending refinement.")
+        else
+            println("\n\t\tRefinement finished.\n")
+        end
 
         simplexvolumes = simplex_volumes(points, simplex_inds)
         imagevolumes = simplex_volumes(image_points, simplex_inds)
