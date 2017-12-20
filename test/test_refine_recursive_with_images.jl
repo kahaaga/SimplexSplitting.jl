@@ -1,8 +1,7 @@
-frac_orig_size = 0.2
 
 @testset "Recursive splitting with forward linear maps of simplices" begin
-    @testset "E = $E" for E in 2:3
-        @testset "k = $k" for k in 1:3
+    @testset "E = $E" for E in 2:4
+        @testset "k = $k" for k in 2:4
         embedding = embedding_example(10, E, 1)
 
         # Triangulate all but the last point
@@ -18,15 +17,31 @@ frac_orig_size = 0.2
         centroids, radii = centroids_radii2(points, simplex_inds)
         centroids_im, radii_im = centroids_radii2(image_points, simplex_inds)
 
-        radiusmax = max(maximum(radii), maximum(radii_im))
-        maxradius_allowed = radiusmax * 0.5
-        @show maxradius_allowed
+        volumes_before = simplex_volumes(points, simplex_inds)
+        imagevolumes_before = simplex_volumes(image_points, simplex_inds)
 
-        refined = refine_recursive_images(points, image_points, simplex_inds, maxradius_allowed, 2)
+        radiusmax = max(maximum(radii), maximum(radii_im))
+        maxradius_allowed = radiusmax * 0.4
+
+        refined = refine_recursive_images(points, image_points, simplex_inds, maxradius_allowed, k)
+
         radiusmax_after_refinement = max(maximum(refined[6]), maximum(refined[7]))
 
+        volumes_after_refinement = refined[8]
+        imagevolumes_after_refinement = refined[9]
+
+
+
+
         # Check that the maximum simplex size has been reduced to the desired level
-        @test radiusmax_after_refinement < maxradius_allowed
+        @testset "Desired refinement level reached" begin
+            @test radiusmax_after_refinement < maxradius_allowed
+        end
+
+        @testset "Triangulation volumes are preserved" begin
+            @test sum(volumes_before) ≈ sum(volumes_after_refinement)
+            @test sum(imagevolumes_before) ≈ sum(imagevolumes_after_refinement)
+        end
         end
     end
 end

@@ -12,26 +12,35 @@ follows: (points, image_points, simplex_inds, centroids, centroids_im, radii, ra
 """
 
 function refine_recursive_images(points, image_points, simplex_inds, maxsize, k; niter = 1)
+    if niter == 1
+        println(size(points, 2), "D triangulation containing ", size(simplex_inds, 1), " simplices.")
+        print("Target simplex radius = ", round(maxsize, 4), ". ")
+        println("Split simplices into subsimplices with radii reduced by  factor of ", k, ".")
+    end
+
     centroids, radii = centroids_radii2(points, simplex_inds)
     centroids_im, radii_im = centroids_radii2(image_points, simplex_inds)
-
     # If convergence is reached, return the triangulation and the centroids and radii of
     # the simplices furnishing the triangulation
     maxradius = max(maximum(radii), maximum(radii_im))
-    println("Refinement #", niter, "\t Maximum simplex radius: ", maxradius)
+    print("Refinement #", niter, "\tMaximum simplex radius = ", floor(maxradius, 4),  ". ")
 
-    if maxradius < maxsize && maxradius < maxsize
-        println("Refinement process finished after ", niter, " iterations.")
-        println("Final maximum simplex radius: ", maxradius)
-        return points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im
+    if maxradius < maxsize || niter > 50
+        println("\n\t\tRefinement finished.\n")
+
+        simplexvolumes = simplex_volumes(points, simplex_inds)
+        imagevolumes = simplex_volumes(image_points, simplex_inds)
+        return points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im,
+                simplexvolumes, imagevolumes
     end
 
     # If no convergence, continue splitting some fraction of the largest simplices.
     if length(radii) == 1
+        percentile = 1.0
         split_indices = [1]
     else
         # What portion of the largest simplices to split (1 - percentile)?
-        percentile = 0.95
+        percentile = 0.999
         split_indices = []
 
         # If the simplices in the triangulation are very regular, there might not be
@@ -46,14 +55,13 @@ function refine_recursive_images(points, image_points, simplex_inds, maxsize, k;
                 split_indices =  find(radii_im .> 0)
             else
                 split_indices = find(radii .> quantile(radii, percentile))
+                split_indices_im = find(radii_im .> quantile(radii, percentile))
+                split_indices = unique([split_indices; split_indices_im])
+
             end
-            percentile = percentile - 0.05
+            percentile = percentile - 0.01
         end
     end
-
-    # There might be no simplices small enough to fall within the criteria above. If so,
-    # split all simplices
-    split_indices = find(radii .> 0)
 
     # The number of simplices to split
     n_split_simplices = length(split_indices)
@@ -73,6 +81,9 @@ function refine_recursive_images(points, image_points, simplex_inds, maxsize, k;
     # How many new vertices are created each split?
     n_newvertices_eachsplit = size(rules, 1)
 
+    println(" Splitting ", n_split_simplices, "/", size(simplex_inds, 1), " (", @sprintf("%.4f", 1.0 - percentile), " %)", " simplices and their corresponding images into ", n_split_simplices * n_newvertices_eachsplit - 1, " subsimplices.")
+
+
     # We need an array that can accomodate all of them. Each row in this
     # array will be a new vertex. Stacks of n_newvertices_eachsplit * E arrays.
     # We have as many as we have simplices to split.
@@ -83,7 +94,7 @@ function refine_recursive_images(points, image_points, simplex_inds, maxsize, k;
     for i = 1:n_split_simplices
         # Figure out what the row indices corresponding to the ith simplex
         # must be. Marks the beginning of each of the simplex stacks in new_points
-        ind = n_newvertices_eachsplit * (i -1)
+        ind = n_newvertices_eachsplit * (i - 1)
 
         # Index of the simplex we need to split
         simplex_idx = split_indices[i]
