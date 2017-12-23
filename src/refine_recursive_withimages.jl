@@ -1,14 +1,16 @@
 """
-    refine_triangulation_images(points, image_points simplex_inds, refsize, k, factor)
+    refine_recursive_images(points, image_points, simplex_inds, maxsize, k)
 
-Refine a triangulation recursively, taking both the simplices and their projection one
-time step into the future. Continue splitting some fraction of the simplices
-with size reduction factor of 2 until until the maximum simplex size is below some
-reference size 'refsize' (for example, the maximum simplex size in the original
-triangulation).
+Refine a triangulation. Consider both simplices and their images.
+Continue splitting some fraction of the simplices
+with size reduction factor of k until until the maximum simplex size is below
+some reference size `refsize` (for example, the maximum simplex size in the
+original triangulation).
 
-Returns a tuple containing the refined triangulation and some information about it, as
-follows: (points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im)
+Returns a tuple containing the refined triangulation and some information about
+it, as follows:
+
+(points, image_points, simplex_inds, centroids, centroids_im, radii, radii_im, simplexvolumes, imagevolumes)
 """
 
 function refine_recursive_images(points, image_points, simplex_inds, maxsize, k; niter = 1)
