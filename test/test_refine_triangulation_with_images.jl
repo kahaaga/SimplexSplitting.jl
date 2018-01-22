@@ -1,8 +1,8 @@
 
 
 @testset "Refine triangulation with images" begin
-    @testset "E = $E" for E in 3:5
-        @testset "k = $k" for k in 1:3
+    @testset "E = $E" for E in 3:3
+        @testset "k = $k" for k in 3:3
             n_points = 10
             tau = 1
             #println(E, " ", k)
