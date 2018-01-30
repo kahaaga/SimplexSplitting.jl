@@ -8,10 +8,10 @@ function invariantset(embedding)
     dim = size(embedding, 2)
 
     # Triangulate the embedding using all points but the last
-    triangulation = SimplexIntersection.QHull.delaunay_tesselation(embedding[1:end-1, :])
+    triangulation = SimplexIntersection.QHull.delaunayn(embedding[1:end-1, :])
 
-    points = triangulation[1]
-    simplex_indices = triangulation[2]
+    points = embedding[1:end-1, :]
+    simplex_indices = triangulation
 
     # Centroids and radii of simplices in the triangulation
     centroids, radii = centroids_radii2(points, simplex_indices)
