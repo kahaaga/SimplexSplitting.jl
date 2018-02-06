@@ -1,5 +1,43 @@
+using Distributions
+
+
 type Embedding
     embedding::Array{Float64}
+end
+
+
+function gaussian_embedding(npts::Int; covariance::Float64 = 0.4)
+    dist = Normal()
+    # Create an uncorrelated source and target
+    invariant_embedding_found = false
+    while !invariant_embedding_found
+        source = rand(dist, npts, 1)
+        dest = covariance .* source[1:end] .+ (1.0 - covariance) .* rand(dist, npts, 1)
+        # Embedding
+        embedd = hcat(source[1:end-1], source[2:end], dest[2:end])
+
+        if invariantset(embedd)
+            invariant_embedding_found = true
+            return Embedding(embedd)
+        end
+    end
+end
+
+function gaussian_embedding_arr(npts::Int, covariance::Float64 = 0.4)
+    dist = Normal()
+    # Create an uncorrelated source and target
+    invariant_embedding_found = false
+    while !invariant_embedding_found
+        source = rand(dist, npts, 1)
+        dest = covariance .* source[1:end] .+ (1.0 - covariance) .* rand(dist, npts, 1)
+        # Embedding
+        embedd = hcat(source[1:end-1], source[2:end], dest[2:end])
+
+        if invariantset(embedd)
+            invariant_embedding_found = true
+            return embedd
+        end
+    end
 end
 
 """

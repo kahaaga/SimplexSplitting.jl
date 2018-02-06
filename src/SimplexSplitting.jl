@@ -59,5 +59,6 @@ export tensordecomposition, simplex_split, simplicial_subdivision_single,
     simplicial_subdivision, embed, Embedding, embedding, embedding_ex, triangulate, Triangulation, triang_from_embedding, embedding_example, refine_triangulation, simplex_volumes,
     refine_triangulation_images, invariantset, centroids_radii2, refine_recursive, refine_recursive_images, refine_variable_k!, refine_variable_k_new, refine_variable_k_newnew, query_refinement,
     plot_triangulation, plot_triangulations, refine_t!, plot_triangulation_and_refined_simplices,
-    plot_simplex_and_point, plot_simplices
+    plot_simplex_and_point, plot_simplices, gaussian_embedding, centroids_radii2, example_triangulation,
+    gaussian_embedding_arr
 end # module

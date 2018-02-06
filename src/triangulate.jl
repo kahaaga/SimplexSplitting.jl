@@ -5,8 +5,8 @@ Triangulate a set of vertices in N dimensions. `points` is an array of vertices,
 each row of the array is a point.
 """
 function triangulate(points::Array{Float64, 2})
-    points, indices = SimplexIntersection.QHull.delaunay_tesselation(points)
-    return points, round.(Int, indices)
+    indices = SimplexIntersection.QHull.delaunayn(points)
+    return indices
 end
 
 """
@@ -53,11 +53,32 @@ Create a `Triangulation` from an invariant `embedding`. Note: this function does
 for invariance. This must have been done beforehand.
 """
 function triang_from_embedding(e::SimplexSplitting.Embedding)
-    points, simplex_inds = triangulate(e.embedding[1:end-1, :])
+    points = e.embedding[1:end-1, :]
+    simplex_inds = triangulate(points)
     impoints = e.embedding[2:end, :]
     c, r = SimplexSplitting.centroids_radii2(points, simplex_inds)
     cim, rim = SimplexSplitting.centroids_radii2(impoints, simplex_inds)
     vol = SimplexSplitting.simplex_volumes(points, simplex_inds)
     volim = SimplexSplitting.simplex_volumes(impoints, simplex_inds)
-    Triangulation(points, impoints, simplex_inds,c, r, vol, cim, rim, volim)
+    Triangulation(points, impoints, simplex_inds, c, r, vol, cim, rim, volim)
+end
+
+
+"""
+    invariant_triangulation(embedding::Array{Float64, 2})
+
+Create a `Triangulation` from an invariant `embedding`. Note: this function does not check
+for invariance. This must have been done beforehand.
+"""
+function example_triangulation(n_simplices::Int)
+    embedding = gaussian_embedding(n_simplices).embedding
+    points = embedding[1:end-1, :]
+    impoints = embedding[2:end, :]
+
+    simplex_inds = triangulate(points)
+    c, r = SimplexSplitting.centroids_radii2(points, simplex_inds)
+    cim, rim = SimplexSplitting.centroids_radii2(impoints, simplex_inds)
+    vol = SimplexSplitting.simplex_volumes(points, simplex_inds)
+    volim = SimplexSplitting.simplex_volumes(impoints, simplex_inds)
+    Triangulation(points, impoints, simplex_inds, c, r, vol, cim, rim, volim)
 end
