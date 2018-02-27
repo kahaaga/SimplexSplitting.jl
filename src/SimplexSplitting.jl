@@ -19,7 +19,6 @@ include("refine_recursive.jl")
 include("refine_recursive_withimages.jl")
 include("refine_t.jl")
 include("refine_variable_k_new.jl")
-include("plot_simplex.jl")
 
 function __init__()
     # E = 3
@@ -58,7 +57,7 @@ end
 export tensordecomposition, simplex_split, simplicial_subdivision_single,
     simplicial_subdivision, embed, Embedding, embedding, embedding_ex, triangulate, Triangulation, triang_from_embedding, embedding_example, refine_triangulation, simplex_volumes,
     refine_triangulation_images, invariantset, centroids_radii2, refine_recursive, refine_recursive_images, refine_variable_k!, refine_variable_k_new, refine_variable_k_newnew, query_refinement,
-    plot_triangulation, plot_triangulations, refine_t!, plot_triangulation_and_refined_simplices,
-    plot_simplex_and_point, plot_simplices, gaussian_embedding, centroids_radii2, example_triangulation,
+    refine_t!,
+    gaussian_embedding, centroids_radii2, example_triangulation,
     gaussian_embedding_arr
 end # module
