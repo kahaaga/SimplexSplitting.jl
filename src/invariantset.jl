@@ -8,7 +8,7 @@ function invariantset(embedding)
     dim = size(embedding, 2)
 
     # Triangulate the embedding using all points but the last
-    triangulation = SimplexIntersection.QHull.delaunayn(embedding[1:end-1, :])
+    triangulation = Simplices.Delaunay.delaunayn(embedding[1:end-1, :])
 
     points = embedding[1:end-1, :]
     simplex_indices = triangulation

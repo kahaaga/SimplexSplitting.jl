@@ -5,7 +5,7 @@ Triangulate a set of vertices in N dimensions. `points` is an array of vertices,
 each row of the array is a point.
 """
 function triangulate(points::Array{Float64, 2})
-    indices = SimplexIntersection.QHull.delaunayn(points)
+    indices = Simplices.Delaunay.delaunayn(points)
     return indices
 end
 
@@ -32,6 +32,9 @@ type Triangulation
     volumes_im::Vector{Float64}
 
 end
+
+todict(t::Triangulation) = Dict([fn => getfield(t, fn) for fn = fieldnames(t)])
+export todict
 
 """
 Returns the allocated memory in Mb for a triangulation of `n_simplices` which are given

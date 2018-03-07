@@ -1,8 +1,7 @@
 using Distributions
 
-
 type Embedding
-    embedding::Array{Float64}
+    embedding::Array{Float64, 2}
 end
 
 

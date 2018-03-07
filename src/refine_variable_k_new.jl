@@ -200,7 +200,7 @@ function refine_variable_k(t::Triangulation,
 
    # Get:
    # (1) The indices of simplices that must be split in order for all the radii of the
-   #     provided simplices to be below a `target_radius`. corresponding
+   #     provided simplices to be below a `target_radius`. 
    # (2) The corresponding splitting factors (`ks`).
    split_info = get_split_info(t, target_radius)
    query = query_refinement(t, target_radius)
