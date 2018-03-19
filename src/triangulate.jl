@@ -1,3 +1,5 @@
+using Parameters
+
 """
     triangulate(points::Array{Float64, 2})
 
@@ -13,24 +15,23 @@ end
     Triangulation(points::Array{Float64, 2}, impoints::Array{Float64, 2},
                 simplex_inds::Array{Int, 2})
 """
-type Triangulation
+@with_kw struct Triangulation
     # The vertices of the triangulation
-    points::Array{Float64, 2}
+    points::Array{Float64, 2} = Array{Float64, 2}()
 
     # The image vertices of the triangulation
-    impoints::Array{Float64, 2}
+    impoints::Array{Float64, 2} = Array{Float64, 2}()
 
     # Array of indices referencing the vertices furnishing each simplex
-    simplex_inds::Array{Int, 2}
+    simplex_inds::Array{Int, 2} = Array{Float64, 2}()
 
     # Some properties of the simplices furnishing the triangulation
-    centroids::Array{Float64, 2}
-    radii::Vector{Float64}
-    volumes::Vector{Float64}
-    centroids_im::Array{Float64, 2}
-    radii_im::Vector{Float64}
-    volumes_im::Vector{Float64}
-
+    centroids::Array{Float64, 2} = Array{Float64, 2}()
+    radii::Vector{Float64} = Float64[]
+    volumes::Vector{Float64} = Float64[]
+    centroids_im::Array{Float64, 2}  = Array{Float64, 2}()
+    radii_im::Vector{Float64} = Float64[]
+    volumes_im::Vector{Float64} = Float64[]
 end
 
 todict(t::Triangulation) = Dict([fn => getfield(t, fn) for fn = fieldnames(t)])
