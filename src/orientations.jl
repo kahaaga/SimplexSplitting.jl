@@ -10,7 +10,7 @@ function orientations(points::AbstractArray{Float64, 2}, simplex_inds::AbstractA
     orientations = Vector{Float64}(n_simplices)
 
     for i = 1:n_simplices
-        orientations[i] = det(hcat(view(points, view(simplex_inds, i, :), :), ones(dim)))
+        orientations[i] = det(hcat(view(points, view(simplex_inds, i, :), :), ones(dim + 1)))
     end
 
     return orientations
