@@ -40,7 +40,7 @@ function gaussian_embedding(npts::Int, covariance::Float64)
     end
 end
 
-function gaussian_embedding_arr(npts::Int, covariance::Float64 = 0.4)
+function gaussian_embedding_arr(npts::Int; covariance::Float64 = 0.4)
     dist = Normal()
     # Create an uncorrelated source and target
     invariant_embedding_found = false

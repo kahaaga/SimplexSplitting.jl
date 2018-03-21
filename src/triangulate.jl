@@ -15,7 +15,7 @@ end
     Triangulation(points::Array{Float64, 2}, impoints::Array{Float64, 2},
                 simplex_inds::Array{Int, 2})
 """
-@with_kw struct Triangulation
+@with_kw mutable struct Triangulation
     # The vertices of the triangulation
     points::Array{Float64, 2} = Array{Float64, 2}()
 
@@ -28,9 +28,11 @@ end
     # Some properties of the simplices furnishing the triangulation
     centroids::Array{Float64, 2} = Array{Float64, 2}()
     radii::Vector{Float64} = Float64[]
-    volumes::Vector{Float64} = Float64[]
     centroids_im::Array{Float64, 2}  = Array{Float64, 2}()
     radii_im::Vector{Float64} = Float64[]
+    orientations::Vector{Float64} = Float64[]
+    orientations_im::Vector{Float64} = Float64[]
+    volumes::Vector{Float64} = Float64[]
     volumes_im::Vector{Float64} = Float64[]
 end
 
