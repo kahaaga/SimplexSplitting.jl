@@ -22,6 +22,7 @@ include("refine_recursive_withimages.jl")
 include("refine_t.jl")
 include("refine_variable_k_new.jl")
 include("orientations.jl")
+include("even_sampling.jl")
 
 
 # E = 3
@@ -64,5 +65,7 @@ refine_triangulation_images, invariantset, centroids_radii2, refine_recursive, r
 refine_t!,
 gaussian_embedding, centroids_radii2, example_triangulation,
 gaussian_embedding_arr,
-orientations
+orientations,
+evenly_sample, 
+even_sampling_rules
 end # module

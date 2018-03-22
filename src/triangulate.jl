@@ -66,7 +66,21 @@ function triang_from_embedding(e::SimplexSplitting.Embedding)
     cim, rim = SimplexSplitting.centroids_radii2(impoints, simplex_inds)
     vol = SimplexSplitting.simplex_volumes(points, simplex_inds)
     volim = SimplexSplitting.simplex_volumes(impoints, simplex_inds)
-    Triangulation(points, impoints, simplex_inds, c, r, vol, cim, rim, volim)
+    orientations = SimplexSplitting.orientations(points, simplex_inds)
+    orientations_im = SimplexSplitting.orientations(impoints, simplex_inds)
+
+    Triangulation(
+        points = points,
+        impoints = impoints,
+        simplex_inds = simplex_inds,
+        centroids = c,
+        radii = r,
+        volumes = vol,
+        centroids_im = cim,
+        radii_im = rim,
+        volumes_im = volim,
+        orientations = orientations,
+        orientations_im = orientations_im)
 end
 
 
