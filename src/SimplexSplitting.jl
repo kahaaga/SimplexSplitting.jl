@@ -2,7 +2,6 @@ __precompile__()
 
 module SimplexSplitting
 
-using Simplices
 
 include("tensordecomposition.jl")
 include("complementary.jl")
@@ -66,6 +65,6 @@ refine_t!,
 gaussian_embedding, centroids_radii2, example_triangulation,
 gaussian_embedding_arr,
 orientations,
-evenly_sample, 
+evenly_sample,
 even_sampling_rules
 end # module
