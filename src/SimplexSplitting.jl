@@ -1,7 +1,5 @@
-__precompile__()
-
 module SimplexSplitting
-
+using Simplices
 
 include("tensordecomposition.jl")
 include("complementary.jl")
