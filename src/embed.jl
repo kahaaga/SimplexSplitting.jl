@@ -4,6 +4,22 @@ type Embedding
     embedding::Array{Float64, 2}
 end
 
+function random_embedding(npts::Int)
+    dist = Normal()
+    # Create an uncorrelated source and target
+    invariant_embedding_found = false
+    while !invariant_embedding_found
+        ts = rand(dist, npts, 1)
+
+        embedd = hcat(ts[1:(end - 2)], ts[2:(end - 1)], ts[3:end])
+
+        if invariantset(embedd)
+            invariant_embedding_found = true
+            return Embedding(embedd)
+        end
+    end
+end
+
 
 function gaussian_embedding(npts::Int; covariance::Float64 = 0.4)
     dist = Normal()
