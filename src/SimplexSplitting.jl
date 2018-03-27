@@ -64,6 +64,7 @@ refine_triangulation_images, invariantset, centroids_radii2, refine_recursive, r
 refine_t!,
 gaussian_embedding, centroids_radii2, example_triangulation,
 gaussian_embedding_arr,
+random_embedding,
 orientations,
 evenly_sample,
 even_sampling_rules
