@@ -163,63 +163,89 @@ type SplitRules
     indices::Array{Int, 2}
 end
 
-function refine_variable_k!(t::Triangulation,
-                        target_radius::Float64)
-   dim = size(t.points, 2)
 
+"""
+Refines a triangulation `t`using shape-preserving simplex subdivision. Uses
+a variable splitting factor, so that all simplices' radii are rendered less
+than `target_radius`. Operates in-place on `t`.
+"""
+function refine_variable_k!(t::Triangulation, target_radius::Float64)
+   #=
    # Get:
-   # (1) The indices of simplices that must be split in order for all the radii of the
-   #     provided simplices to be below a `target_radius`. corresponding
+   # (1) The indices of simplices that must be split in order for all the radii
+   #     of the provided simplices to be below a `target_radius`.
    # (2) The corresponding splitting factors (`ks`).
+   =#
    split_info = get_split_info(t, target_radius)
    query = query_refinement(t, target_radius)
    @assert split_info.ks == query.ks
-   # If any of the original simplices doesn't need to be split, keep track of their indices
-   untouched_inds = setdiff(1:size(t.simplex_inds, 1), split_info.inds_toolarge)
+
+   # If any simplices does not need splitting, keep track of their indices
+   n_simplices = size(t.simplex_inds, 1)
+   untouched_inds = setdiff(1:n_simplices, split_info.inds_toolarge)
+
    if length(untouched_inds) > 0
        simplex_inds = vcat(t.simplex_inds, t.simplex_inds[untouched_inds, :])
    end
 
-   # For each k, split all simplices that needs to be split with that splitting factor
+   # Loop over splitting factors
    for i in 1:length(unique(split_info.ks))
+      #=
+      # Split all simplices that needs to be split with this splitting factor
+      # in order to reduce their radius to below `target_radius`
+      =#
       k = unique(split_info.ks)[i]
       split_inds = split_info.inds_toolarge[find(split_info.ks .== k)]
 
       if length(split_inds) > 0
          refine_t!(t, split_inds, k)
       else
-         println("Target radius too large. Simplex radii are already smaller than this.")
+         warn("Target radius $target_radius is too large. All simplex radii are
+               already smaller than this.")
       end
    end
 end
 
 
-function refine_variable_k(t::Triangulation,
-                        target_radius::Float64)
-   dim = size(t.points, 2)
-
+"""
+Refines a triangulation `t`using shape-preserving simplex subdivision. Uses
+a variable splitting factor, so that all simplices' radii are rendered less
+than `target_radius`.
+"""
+function refine_variable_k(t::Triangulation, target_radius::Float64)
+   #=
    # Get:
-   # (1) The indices of simplices that must be split in order for all the radii of the
-   #     provided simplices to be below a `target_radius`. 
+   # (1) The indices of simplices that must be split in order for all the radii
+   #     of the provided simplices to be below a `target_radius`.
    # (2) The corresponding splitting factors (`ks`).
+   =#
    split_info = get_split_info(t, target_radius)
    query = query_refinement(t, target_radius)
    @assert split_info.ks == query.ks
-   # If any of the original simplices doesn't need to be split, keep track of their indices
-   untouched_inds = setdiff(1:size(t.simplex_inds, 1), split_info.inds_toolarge)
+
+   # If any simplices does not need splitting, keep track of their indices
+   dim = size(t.points, 2)
+   n_simplices = size(t.simplex_inds, 1)
+   untouched_inds = setdiff(1:n_simplices, split_info.inds_toolarge)
+
    if length(untouched_inds) > 0
        simplex_inds = vcat(t.simplex_inds, t.simplex_inds[untouched_inds, :])
    end
 
-   # For each k, split all simplices that needs to be split with that splitting factor
+   # Loop over splitting factors
    for i in 1:length(unique(split_info.ks))
+      #=
+      # Split all simplices that needs to be split with this splitting factor
+      # in order to reduce their radius to below `target_radius`
+      =#
       k = unique(split_info.ks)[i]
       split_inds = split_info.inds_toolarge[find(split_info.ks .== k)]
 
       if length(split_inds) > 0
          refine_t!(t, split_inds, k)
       else
-         println("Target radius too large. Simplex radii are already smaller than this.")
+         warn("Target radius $target_radius is too large. All simplex radii are
+               already smaller than this.")
       end
    end
 end

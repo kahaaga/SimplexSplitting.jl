@@ -19,7 +19,7 @@ include("simplexvolumes.jl")
 include("refine_recursive.jl")
 include("refine_recursive_withimages.jl")
 include("refine_t.jl")
-include("refine_variable_k_new.jl")
+include("refine_variable_k.jl")
 include("orientations.jl")
 include("even_sampling.jl")
 
