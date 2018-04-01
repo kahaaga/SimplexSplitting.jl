@@ -24,11 +24,14 @@ function even_sampling_rules(dim::Int, split_factor::Int)
 
     M = M ./ (split_factor * (dim + 1))
 
-    return M
+    return M.'
 end
 
 """
-Evenly sample points within a simplex by performing a shape-preserving subdivision of the simplex with a given `split_factor`. If the simplex lives in a space of dimension `dim`, the resulting number of points is `split_factor`^(dim).
+Evenly sample points within a simplex by performing a shape-preserving
+subdivision of the simplex with a given `split_factor`. If the simplex
+lives in a space of dimension `dim`, the resulting number of points is
+`split_factor`^(dim).
 """
 function evenly_sample(simplex::AbstractArray{Float64, 2}, split_factor::Int)
     dim = size(simplex, 2)
