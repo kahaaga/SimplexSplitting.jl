@@ -67,5 +67,8 @@ gaussian_embedding_arr,
 random_embedding,
 orientations,
 evenly_sample,
-even_sampling_rules
+even_sampling_rules,
+Simplex,
+find_simplex, find_imsimplex,
+get_simplices, get_imagesimplices
 end # module

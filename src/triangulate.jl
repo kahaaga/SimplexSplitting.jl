@@ -84,6 +84,7 @@ function triang_from_embedding(e::SimplexSplitting.Embedding)
 end
 
 
+
 """
     invariant_triangulation(embedding::Array{Float64, 2})
 
@@ -101,4 +102,65 @@ function example_triangulation(n_simplices::Int)
     vol = SimplexSplitting.simplex_volumes(points, simplex_inds)
     volim = SimplexSplitting.simplex_volumes(impoints, simplex_inds)
     Triangulation(points, impoints, simplex_inds, c, r, vol, cim, rim, volim)
+end
+
+
+
+
+struct Simplex
+    v::Vector{Vector{Float64}}
+end
+
+
+"""
+Find the simplex with index i
+"""
+function find_simplex(t::Triangulation, i::Int)
+    s = Vector{Vector{Float64}}(4)
+    n_vertices = size(t.simplex_inds, 2)
+    for j in 1:n_vertices
+        s[j] = t.points[t.simplex_inds[i, j], :]
+    end
+    return Simplex(s)
+end
+
+
+"""
+Find the image simplex with index i
+"""
+function find_imsimplex(t::Triangulation, i::Int)
+    s = Vector{Vector{Float64}}(4)
+    n_vertices = size(t.simplex_inds, 2)
+    for j in 1:n_vertices
+        s[j] = t.impoints[t.simplex_inds[i, j], :]
+    end
+    return Simplex(s)
+end
+
+function get_simplices(t::Triangulation)
+    n_simplices = size(t.simplex_inds, 1)
+    simplices = Vector{Simplex}(n_simplices)
+    for i = 1:n_simplices
+        simplices[i] = find_simplex(t, i)
+    end
+    simplices
+end
+
+function get_imagesimplices(t::Triangulation)
+    n_simplices = size(t.simplex_inds, 1)
+    simplices = Vector{Simplex}(n_simplices)
+    for i = 1:n_simplices
+        simplices[i] = find_imsimplex(t, i)
+    end
+    simplices
+end
+
+
+
+function newpoint!(pt::Array{Float64, 1}, s::Simplex, coeffs)
+    pt .= 0.0
+    for i in 1:length(s.v)
+        pt .= pt .+ coeffs[i] * s.v[i]
+    end
+    pt
 end
