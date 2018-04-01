@@ -35,6 +35,6 @@ lives in a space of dimension `dim`, the resulting number of points is
 """
 function evenly_sample(simplex::AbstractArray{Float64, 2}, split_factor::Int)
     dim = size(simplex, 2)
-    centroids_exp_coeffs = even_sampling_rules(dim, split_factor)
+    centroids_exp_coeffs = even_sampling_rules(dim, split_factor).'
     centroids_exp_coeffs * simplex
 end
