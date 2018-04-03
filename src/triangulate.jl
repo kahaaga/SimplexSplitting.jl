@@ -17,18 +17,18 @@ end
 """
 @with_kw mutable struct Triangulation
     # The vertices of the triangulation
-    points::Array{Float64, 2} = Array{Float64, 2}()
+    points::Array{Float64, 2} = Array{Float64, 2}(0, 0)
 
     # The image vertices of the triangulation
-    impoints::Array{Float64, 2} = Array{Float64, 2}()
+    impoints::Array{Float64, 2} = Array{Float64, 2}(0, 0)
 
     # Array of indices referencing the vertices furnishing each simplex
-    simplex_inds::Array{Int, 2} = Array{Float64, 2}()
+    simplex_inds::Array{Int, 2} = Array{Float64, 2}(0, 0)
 
     # Some properties of the simplices furnishing the triangulation
-    centroids::Array{Float64, 2} = Array{Float64, 2}()
+    centroids::Array{Float64, 2} = Array{Float64, 2}(0, 0)
     radii::Vector{Float64} = Float64[]
-    centroids_im::Array{Float64, 2}  = Array{Float64, 2}()
+    centroids_im::Array{Float64, 2}  = Array{Float64, 2}(0, 0)
     radii_im::Vector{Float64} = Float64[]
     orientations::Vector{Float64} = Float64[]
     orientations_im::Vector{Float64} = Float64[]
