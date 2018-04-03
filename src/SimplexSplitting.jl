@@ -3,7 +3,6 @@ __precompile__(true)
 module SimplexSplitting
 using Simplices
 
-include("tensordecomposition.jl")
 include("complementary.jl")
 include("simplex_split.jl")
 include("simplex_subdivision.jl")
@@ -21,7 +20,6 @@ include("refine_recursive_withimages.jl")
 include("refine_t.jl")
 include("refine_variable_k.jl")
 include("orientations.jl")
-include("even_sampling.jl")
 
 export tensordecomposition, simplex_split, simplicial_subdivision_single,
 simplicial_subdivision, embed, Embedding, embedding, embedding_ex, triangulate, Triangulation, triang_from_embedding, embedding_example, refine_triangulation, simplex_volumes,
@@ -31,8 +29,6 @@ gaussian_embedding, centroids_radii2, example_triangulation,
 gaussian_embedding_arr,
 random_embedding,
 orientations,
-evenly_sample,
-even_sampling_rules,
 Simplex,
 find_simplex, find_imsimplex,
 get_simplices, get_imagesimplices,

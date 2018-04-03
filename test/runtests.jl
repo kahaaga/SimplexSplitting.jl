@@ -6,7 +6,6 @@ using Base.Test
 #include("test_embed.jl")
 #include("test_triangulate.jl")
 
-#include("test_even_sampling.jl")
 include("triangulate.jl")
 #@show example_triangulation(n_simplices = 100)
 
