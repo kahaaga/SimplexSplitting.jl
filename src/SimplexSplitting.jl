@@ -13,11 +13,17 @@ if !("Conda" in keys(installed))
     using Conda; Conda.add("scipy")
 end
 
+if !("Parameters" in keys(installed))
+    Pkg.add("Parameters"); using Parameters;
+end
+
 if !("Simplices" in keys(installed))
     Pkg.clone("https://github.com/kahaaga/Simplices.jl")
 else
     using Simplices
 end
+
+using Pycall, Conda, Parameters, Simplices
 
 include("complementary.jl")
 include("simplex_split.jl")
