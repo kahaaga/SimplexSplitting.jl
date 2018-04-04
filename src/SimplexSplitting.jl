@@ -1,7 +1,13 @@
 __precompile__(true)
 
 module SimplexSplitting
-using Simplices
+
+installed = Pkg.installed()
+if !("Simplices" in keys(installed))
+    Pkg.clone("https://github.com/kahaaga/Simplices.jl")
+else
+    using Simplices
+end
 
 include("complementary.jl")
 include("simplex_split.jl")
