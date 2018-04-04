@@ -3,11 +3,23 @@ __precompile__(true)
 module SimplexSplitting
 
 installed = Pkg.installed()
+
+if !("Conda" in keys(installed))
+    Pkg.add("Conda")
+    using Conda; Conda.add("scipy")
+end
+
+if !("Parameters" in keys(installed))
+    Pkg.add("Parameters"); using Parameters;
+end
+
 if !("Simplices" in keys(installed))
     Pkg.clone("https://github.com/kahaaga/Simplices.jl")
 else
     using Simplices
 end
+
+ENV["PYTHON"]= ""; Pkg.build("PyCall"); using PyCall
 
 include("complementary.jl")
 include("simplex_split.jl")
