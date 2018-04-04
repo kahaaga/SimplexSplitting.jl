@@ -5,7 +5,7 @@ module SimplexSplitting
 installed = Pkg.installed()
 if !("Pycall" in keys(installed))
     Pkg.add("PyCall")
-    ENV["PYTHON"]="", run Pkg.build("PyCall")
+    ENV["PYTHON"]= ""; Pkg.build("PyCall")
 end
 
 if !("Conda") in keys(installed)
